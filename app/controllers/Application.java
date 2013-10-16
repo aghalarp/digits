@@ -60,4 +60,15 @@ public class Application extends Controller {
     }
     
   }
+  
+  /**
+   * Deletes corresponding ID from ContactDB.
+   * @param id The id to delete.
+   * @return Index page.
+   */
+  public static Result deleteContact(long id) {
+    ContactDB.deleteContact(id);
+    
+    return ok(Index.render(ContactDB.getContacts()));
+  }
 }

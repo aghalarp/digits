@@ -53,4 +53,19 @@ public class ContactDB {
     }
   }
   
+  /**
+   * Deletes a specified id from the contacts Map.
+   * @param id The ID to delete.
+   */
+  public static void deleteContact(long id) {
+    Contact contact = contacts.get(id);
+    
+    if (contact == null) {
+      throw new RuntimeException("Passed a bogus id: " + id);
+    }
+    else {
+      contacts.remove(id);
+    }
+  }
+  
 }

@@ -1,7 +1,9 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import views.formdata.ContactFormData;
 
 /**
@@ -11,19 +13,18 @@ import views.formdata.ContactFormData;
  */
 public class ContactDB {
   
-  private static List<Contact> contacts = new ArrayList<>();
+  private static Map<Long, Contact> contacts = new HashMap<>();
   
   /**
-   * Creates and returns a new Contact, storing it in the in-memory repository.
+   * Update the repo with a new Contact if id = 0, or update a pre-existing contact if id != 0.
    * @param formData The contact data.
    * @return The newly created contact.
    */
   public static Contact addContact(ContactFormData formData) {
-    //Create new contact object with formData info
-    Contact contact = new Contact(formData.firstName, formData.lastName, formData.telephone);
+    long idVal = (formData.id == 0) ? contacts.size() + 1 : formData.id;
+    Contact contact = new Contact(idVal, formData.firstName, formData.lastName, formData.telephone);
     
-    //Add contact object to List
-    contacts.add(contact);
+    contacts.put(idVal, contact);
     
     return contact;
   }
@@ -33,8 +34,23 @@ public class ContactDB {
    * @return A list of Contact instances.
    */
   public static List<Contact> getContacts() {
-    return contacts;
+    return new ArrayList<>(contacts.values());
   }
   
+  /**
+   * Returns a Contact instance associated with the passed ID, or throws a RuntimeException if the ID is not found.
+   * @param id The ID.
+   * @return The retrieved ID.
+   */
+  public static Contact getContact(long id) {
+    Contact contact = contacts.get(id);
+    
+    if (contact == null) {
+      throw new RuntimeException("Passed a bogus id: " + id);
+    }
+    else {
+      return contact;
+    }
+  }
   
 }

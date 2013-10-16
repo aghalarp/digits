@@ -1,7 +1,9 @@
 package controllers;
 
+import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import views.formdata.ContactFormData;
 import views.html.Index;
 import views.html.NewContact;
 
@@ -19,11 +21,27 @@ public class Application extends Controller {
   }
   
   /**
-   * Returns page1, a simple example of a second page to illustrate navigation.
-   * @return The Page1.
+   * Returns newcontact, a page containing a simple form.
+   * @return The NewContact page.
    */
-  public static Result newcontact() {
-    return ok(NewContact.render("Welcome to Page1."));
+  public static Result newContact() {
+    Form<ContactFormData> formData = Form.form(ContactFormData.class);
+    return ok(NewContact.render(formData));
+    
+  }
+  
+  /**
+   * Handles the posting of form data by the user.
+   * @return The NewContact page with form data.
+   */
+  public static Result postContact() {
+    Form<ContactFormData> formData = Form.form(ContactFormData.class).bindFromRequest();
+    ContactFormData data = formData.get(); //Creates the object we made (ContactFormData) and fills with get data
+    
+    //Prints out data attributes
+    System.out.println(data.firstName + " " + data.lastName + " " + data.telephone);
+    
+    return ok(NewContact.render(formData));
     
   }
 }

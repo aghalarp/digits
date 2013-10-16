@@ -36,12 +36,26 @@ public class Application extends Controller {
    */
   public static Result postContact() {
     Form<ContactFormData> formData = Form.form(ContactFormData.class).bindFromRequest();
-    ContactFormData data = formData.get(); //Creates the object we made (ContactFormData) and fills with get data
     
-    //Prints out data attributes
-    System.out.println(data.firstName + " " + data.lastName + " " + data.telephone);
-    
-    return ok(NewContact.render(formData));
+    /* Important to understand: Whenever we invoke bindFromRequest(), if there is a validation() method in the
+     * associated object's class (in this case, ContactFormData) that implements the form, it will call that validation
+     * method and annotate that object with information about any found errors (We see that the validate() method
+     * returns either null or a list of ValidationErrors). We can then check if the formData object contains any errors
+     * by calling the hasErrors() method, as seen below.
+     * 
+     * Also remember: We cannot call the get() method if there are errors in the formData object, so we put it in the
+     * else clause.
+     */
+    if (formData.hasErrors()) {
+      System.out.println("Errors Found");
+      return badRequest(NewContact.render(formData));
+    }
+    else {
+      ContactFormData data = formData.get(); //Creates the object we made (ContactFormData) and fills with get data
+      //Prints out data attributes
+      System.out.println("OK: " + data.firstName + " " + data.lastName + " " + data.telephone);
+      return ok(NewContact.render(formData));
+    }
     
   }
 }

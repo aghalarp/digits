@@ -5,34 +5,40 @@
 @Main("NewContact") {
 <div class="container">
   @form(routes.Application.postContact(), 'class -> "form-horizontal") {
-    <div class="form-group">
+    <div class="form-group @if(contactForm("firstName").hasErrors) {has-error}">
       <label class="col-sm-2 control-label">First</label>
       <div class="col-sm-10">
         <input type="text" class="form-control" 
-               name="@contactForm("firstName").name"
-               id="@contactForm("firstName").id"
-               value="@contactForm("firstName").value"
+               name="@contactForm("firstName").name" 
+               id="@contactForm("firstName").id" 
+               value="@contactForm("firstName").value" 
                placeholder="First Name">
+               
+        <span class="help-block">@{contactForm("firstName").error.map { error => error.message}}</span>
       </div>
     </div>
-    <div class="form-group">
+    <div class="form-group @if(contactForm("lastName").hasErrors) {has-error}">
       <label class="col-sm-2 control-label">Last</label>
       <div class="col-sm-10">
-      <input type="text" class="form-control" 
-               name="@contactForm("lastName").name"
-               id="@contactForm("lastName").id"
-               value="@contactForm("lastName").value"
-               placeholder="Last Name">
+        <input type="text" class="form-control" 
+                 name="@contactForm("lastName").name" 
+                 id="@contactForm("lastName").id" 
+                 value="@contactForm("lastName").value" 
+                 placeholder="Last Name">
+                 
+        <span class="help-block">@{contactForm("lastName").error.map { error => error.message}}</span>
       </div>
     </div>
-    <div class="form-group">
+    <div class="form-group @if(contactForm("telephone").hasErrors) {has-error}">
       <label class="col-sm-2 control-label">Phone</label>
       <div class="col-sm-10">
-        <input type="tel" class="form-control"
-               name="@contactForm("telephone").name"
-               id="@contactForm("telephone").id"
-               value="@contactForm("telephone").value"
+        <input type="tel" class="form-control" 
+               name="@contactForm("telephone").name" 
+               id="@contactForm("telephone").id" 
+               value="@contactForm("telephone").value" 
                placeholder="Telephone">
+               
+        <span class="help-block">@{contactForm("telephone").error.map { error => error.message}}</span>
       </div>
     </div>
     

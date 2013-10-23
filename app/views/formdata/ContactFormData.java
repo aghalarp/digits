@@ -31,6 +31,25 @@ public class ContactFormData {
     // default no-arg constructor.
   }
   
+  
+  
+  /**
+   * Create a new ContactFormData object manually.
+   * Currently only used by Global.java to create initial contacts on application startup.
+   * @param firstName The first name.
+   * @param lastName The last name.
+   * @param telephone The telephone.
+   * @param telephoneType The telephone type.
+   */
+  public ContactFormData(String firstName, String lastName, String telephone, String telephoneType) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.telephone = telephone;
+    this.telephoneType = telephoneType;
+  }
+
+
+
   /**
    * Create a ContactFormData object based upon a Contact.
    * @param contact The contact.

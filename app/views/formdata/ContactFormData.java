@@ -21,6 +21,8 @@ public class ContactFormData {
   public String lastName = "";
   /** The telephone form field. */
   public String telephone = "";
+  /** The telephone type. */
+  public String telephoneType = "";
   
   /**
    * The default constructor, required by Play.
@@ -38,6 +40,7 @@ public class ContactFormData {
     this.firstName = contact.getFirstName();
     this.lastName = contact.getLastName();
     this.telephone = contact.getTelephone();
+    this.telephoneType = contact.getTelephoneType();
   }
   
   
@@ -67,6 +70,10 @@ public class ContactFormData {
     
     if (telephone.length() != NUM_TELEPHONE_CHARS) {
       errors.add(new ValidationError("telephone", "Telephone must be in the form of xxx-xxx-xxxx"));
+    }
+    
+    if (!TelephoneTypes.isType(telephoneType)) {
+      errors.add(new ValidationError("telephoneType", "Telephone type is invalid."));
     }
     
     return errors.isEmpty() ? null : errors;

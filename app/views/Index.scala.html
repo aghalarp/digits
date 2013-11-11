@@ -1,28 +1,30 @@
-@(contacts: List[Contact])
+@(page: String, isLoggedIn: Boolean, userInfo: UserInfo, contacts: List[Contact])
 
-@Main("Home") {
+@Main(page, isLoggedIn, userInfo) {
 <div class="container">
-  <h1>Current Contacts</h1>
-  
-  <table class="table table-striped table-bordered">
-    <tr>
-      <th>First</th>
-      <th>Last</th>
-      <th>Phone</th>
-      <th>Type</th>
-    </tr>
+  @if(isLoggedIn) {
+    <h1>Current Contacts</h1>
     
-    @for(contact <- contacts) {
+    <table class="table table-striped table-bordered">
       <tr>
-        <td>@contact.getFirstName()</td>
-        <td>@contact.getLastName()</td>
-        <td>@contact.getTelephone()</td>
-        <td>@contact.getTelephoneType()</td>
-        <td><a class="btn btn-warning btn-xs" href="@routes.Application.newContact(contact.getId())">Edit</a></td>
-        <td><a class="btn btn-danger btn-xs" href="@routes.Application.deleteContact(contact.getId())">Delete</a></td>
+        <th>First</th>
+        <th>Last</th>
+        <th>Phone</th>
+        <th>Type</th>
       </tr>
-    }
-
-  </table>
+      
+      @for(contact <- contacts) {
+        <tr>
+          <td>@contact.getFirstName()</td>
+          <td>@contact.getLastName()</td>
+          <td>@contact.getTelephone()</td>
+          <td>@contact.getTelephoneType()</td>
+          <td><a class="btn btn-warning btn-xs" href="@routes.Application.newContact(contact.getId())">Edit</a></td>
+          <td><a class="btn btn-danger btn-xs" href="@routes.Application.deleteContact(contact.getId())">Delete</a></td>
+        </tr>
+      }
+  
+    </table>
+  }
 </div>
 }

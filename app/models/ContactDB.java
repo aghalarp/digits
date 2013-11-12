@@ -78,16 +78,21 @@ public class ContactDB {
   
   /**
    * Deletes a specified id from the contacts Map.
+   * @param user The user.
    * @param id The ID to delete.
    */
   public static void deleteContact(String user, long id) {
+    if (!isUser(user)) {
+      throw new RuntimeException("Passed a bogus user: " + user);
+    }
+    
     Contact contact = contacts.get(user).get(id);
     
     if (contact == null) {
       throw new RuntimeException("Passed a bogus id: " + id);
     }
     else {
-      contacts.remove(id);
+      contacts.get(user).remove(id);
     }
   }
   

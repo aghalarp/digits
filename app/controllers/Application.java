@@ -2,6 +2,8 @@ package controllers;
 
 import java.util.Map;
 import models.ContactDB;
+import models.UserInfo;
+import models.UserInfoDB;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -22,8 +24,12 @@ public class Application extends Controller {
    * Returns the home page. 
    * @return The resulting home page. 
    */
+  @Security.Authenticated(Secured.class)
   public static Result index() {
-    return ok(Index.render("Home", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts()));
+    UserInfo userInfo = UserInfoDB.getUser(request().username());
+    String user = userInfo.getEmail();
+    Boolean isLoggedIn = (userInfo != null);
+    return ok(Index.render("Home", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts(user)));
   }
   
   /**
@@ -33,7 +39,11 @@ public class Application extends Controller {
    */
   @Security.Authenticated(Secured.class)
   public static Result newContact(long id) {
-    ContactFormData data = (id == 0) ? new ContactFormData() : new ContactFormData(ContactDB.getContact(id));
+    UserInfo userInfo = UserInfoDB.getUser(request().username());
+    String user = userInfo.getEmail();
+    Boolean isLoggedIn = (userInfo != null);
+    
+    ContactFormData data = (id == 0) ? new ContactFormData() : new ContactFormData(ContactDB.getContact(user, id));
     Form<ContactFormData> formData = Form.form(ContactFormData.class).fill(data);
     Map<String, Boolean> telephoneTypeMap = TelephoneTypes.getTypes(data.telephoneType);
     return ok(NewContact.render("New", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData, telephoneTypeMap));
@@ -46,6 +56,10 @@ public class Application extends Controller {
    */
   @Security.Authenticated(Secured.class)
   public static Result postContact() {
+    UserInfo userInfo = UserInfoDB.getUser(request().username());
+    String user = userInfo.getEmail();
+    Boolean isLoggedIn = (userInfo != null);
+    
     Form<ContactFormData> formData = Form.form(ContactFormData.class).bindFromRequest();
     
     /* Important to understand: Whenever we invoke bindFromRequest(), if there is a validation() method in the
@@ -65,7 +79,7 @@ public class Application extends Controller {
     else {
       ContactFormData data = formData.get(); //Creates the object we made (ContactFormData) and fills with get data
       //Add to database
-      ContactDB.addContact(data);
+      ContactDB.addContact(user, data);
       Map<String, Boolean> telephoneTypeMap = TelephoneTypes.getTypes(data.telephoneType);
       return ok(NewContact.render("New", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData, telephoneTypeMap));
     }
@@ -79,9 +93,12 @@ public class Application extends Controller {
    */
   @Security.Authenticated(Secured.class)
   public static Result deleteContact(long id) {
-    ContactDB.deleteContact(id);
+    UserInfo userInfo = UserInfoDB.getUser(request().username());
+    String user = userInfo.getEmail();
+    Boolean isLoggedIn = (userInfo != null);
+    ContactDB.deleteContact(user, id);
     
-    return ok(Index.render("Home", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts()));
+    return ok(Index.render("Home", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts(user)));
   }
   
   /**

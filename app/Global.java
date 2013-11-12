@@ -16,12 +16,12 @@ public class Global extends GlobalSettings {
    * @param app The application.
    */
   public void onStart(Application app) {
-    
     UserInfoDB.addUserInfo("John Smith", "smith@example.com", "password");
+    ContactDB.addContact("smith@example.com", new ContactFormData("David", "Smith", "123-456-7890", "Home"));
+    ContactDB.addContact("smith@example.com", new ContactFormData("John", "Smith", "123-456-7890", "Work"));
     
-    ContactDB.addContact(new ContactFormData("David", "Aghalarpour", "123-456-7890", "Home"));
-    ContactDB.addContact(new ContactFormData("John", "Smith", "123-456-7890", "Work"));
-    ContactDB.addContact(new ContactFormData("Jane", "Doe", "123-456-7890", "Mobile"));
-    ContactDB.addContact(new ContactFormData("Michael", "Fassbender", "123-456-7890", "Work"));
+    UserInfoDB.addUserInfo("Patty Jones", "jones@example.com", "password");
+    ContactDB.addContact("jones@example.com", new ContactFormData("Sally", "Jones", "123-456-7890", "Mobile"));
+    ContactDB.addContact("jones@example.com", new ContactFormData("Michael", "Jones", "123-456-7890", "Work"));
   } 
-} 
+}

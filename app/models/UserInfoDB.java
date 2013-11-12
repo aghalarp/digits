@@ -15,7 +15,7 @@ public class UserInfoDB {
   private static boolean adminDefined = false;
   
   /**
-   * Defines the admin account if the values are non-null
+   * Defines the admin account if the values are non-null.
    * @param name Their name.
    * @param email Their email, or null if not found.
    * @param password Their password, or null if not found.

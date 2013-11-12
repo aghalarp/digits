@@ -10,6 +10,7 @@ import play.mvc.Result;
 import play.mvc.Security;
 import views.formdata.ContactFormData;
 import views.formdata.LoginFormData;
+import views.formdata.RegistrationFormData;
 import views.formdata.TelephoneTypes;
 import views.html.Index;
 import views.html.Login;
@@ -24,10 +25,10 @@ public class Application extends Controller {
    * Returns the home page. 
    * @return The resulting home page. 
    */
-  @Security.Authenticated(Secured.class)
   public static Result index() {
     UserInfo userInfo = UserInfoDB.getUser(request().username());
     String user = userInfo.getEmail();
+    //String user = Secured.getUser(ctx());
     Boolean isLoggedIn = (userInfo != null);
     return ok(Index.render("Home", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts(user)));
   }
@@ -106,8 +107,10 @@ public class Application extends Controller {
    * @return The Login page. 
    */
   public static Result login() {
-    Form<LoginFormData> formData = Form.form(LoginFormData.class);
-    return ok(Login.render("Login", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData));
+    Form<LoginFormData> loginFormData = Form.form(LoginFormData.class);
+    Form<RegistrationFormData> registrationFormData = Form.form(RegistrationFormData.class);
+    
+    return ok(Login.render("Login", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), loginFormData, registrationFormData));
   }
 
   /**
@@ -121,16 +124,18 @@ public class Application extends Controller {
   public static Result postLogin() {
 
     // Get the submitted form data from the request object, and run validation.
-    Form<LoginFormData> formData = Form.form(LoginFormData.class).bindFromRequest();
+    Form<LoginFormData> loginFormData = Form.form(LoginFormData.class).bindFromRequest();
+    
+    Form<RegistrationFormData> registrationFormData = Form.form(RegistrationFormData.class);
 
-    if (formData.hasErrors()) {
+    if (loginFormData.hasErrors()) {
       flash("error", "Login credentials not valid.");
-      return badRequest(Login.render("Login", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData));
+      return badRequest(Login.render("Login", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), loginFormData, registrationFormData));
     }
     else {
       // email/password OK, so now we set the session variable and only go to authenticated pages.
       session().clear();
-      session("email", formData.get().email);
+      session("email", loginFormData.get().email);
       return redirect(routes.Application.index());
     }
   }
@@ -144,4 +149,24 @@ public class Application extends Controller {
     session().clear();
     return redirect(routes.Application.index());
   }
+  
+  /**
+   * Handles registration form
+   * @return
+   */
+  public static Result postRegistration() {
+    Form<LoginFormData> loginFormData = Form.form(LoginFormData.class);
+    Form<RegistrationFormData> registrationFormData = Form.form(RegistrationFormData.class).bindFromRequest();
+
+    if (registrationFormData.hasErrors()) {
+      return badRequest(Login.render("Login", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), loginFormData, registrationFormData));
+    }
+    else {
+      UserInfoDB.addUserInfo(registrationFormData.get().name, registrationFormData.get().email, registrationFormData.get().password);
+      session().clear();
+      session("email", registrationFormData.get().email);
+      return redirect(routes.Application.index());
+    }
+  }
+  
 }

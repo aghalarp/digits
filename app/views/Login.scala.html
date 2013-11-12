@@ -1,0 +1,13 @@
+@(page: String, isLoggedIn: Boolean, userInfo: UserInfo, loginForm: Form[views.formdata.LoginFormData])
+
+@import bootstrap3._
+
+@Main(page, isLoggedIn, userInfo) {
+   <div class="container">
+     @loginform(routes.Application.postLogin(), loginForm("email"), loginForm("password"))
+     
+     @if(!models.UserInfoDB.adminDefined()) {
+       <div class="alert alert-danger">Warning: Admin credentials have not been defined!</div>
+     }
+   </div>
+}

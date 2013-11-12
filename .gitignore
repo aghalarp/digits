@@ -15,4 +15,8 @@ dist
 /.settings
 /.target
 /.DS_Store
+<<<<<<< HEAD
 .checkstyle
+=======
+.checkstyle
+>>>>>>> origin/cloudauthentication-1

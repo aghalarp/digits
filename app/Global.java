@@ -24,4 +24,4 @@ public class Global extends GlobalSettings {
     ContactDB.addContact(new ContactFormData("Jane", "Doe", "123-456-7890", "Mobile"));
     ContactDB.addContact(new ContactFormData("Michael", "Fassbender", "123-456-7890", "Work"));
   } 
-}
+} 

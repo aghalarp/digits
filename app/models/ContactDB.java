@@ -40,7 +40,7 @@ public class ContactDB {
    */
   public static List<Contact> getContacts(String user) {
     if (!isUser(user)) {
-      return null; //Or maybe return empty new ArrayList?
+      return new ArrayList<>(); //was initially null
     }
     return new ArrayList<>(contacts.get(user).values());
   }

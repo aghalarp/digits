@@ -26,10 +26,10 @@ public class Application extends Controller {
    * @return The resulting home page. 
    */
   public static Result index() {
-    UserInfo userInfo = UserInfoDB.getUser(request().username());
-    String user = userInfo.getEmail();
-    //String user = Secured.getUser(ctx());
-    Boolean isLoggedIn = (userInfo != null);
+    //UserInfo userInfo = UserInfoDB.getUser(request().username());
+    //String user = userInfo.getEmail();
+    String user = Secured.getUser(ctx());
+    //Boolean isLoggedIn = (userInfo != null);
     return ok(Index.render("Home", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts(user)));
   }
   

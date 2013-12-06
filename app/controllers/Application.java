@@ -43,7 +43,7 @@ public class Application extends Controller {
     String user = userInfo.getEmail();
     Boolean isLoggedIn = (userInfo != null);
     
-    ContactFormData data = (id == 0) ? new ContactFormData() : new ContactFormData(ContactDB.getContact(user, id));
+    ContactFormData data = (id == -1) ? new ContactFormData() : new ContactFormData(ContactDB.getContact(user, id));
     Form<ContactFormData> formData = Form.form(ContactFormData.class).fill(data);
     Map<String, Boolean> telephoneTypeMap = TelephoneTypes.getTypes(data.telephoneType);
     return ok(NewContact.render("New", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData, telephoneTypeMap));

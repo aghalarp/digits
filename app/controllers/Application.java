@@ -24,12 +24,11 @@ public class Application extends Controller {
    * Returns the home page. 
    * @return The resulting home page.  
    */
-  @Security.Authenticated(Secured.class)
   public static Result index() {
-    UserInfo userInfo = UserInfoDB.getUser(request().username());
-    String user = userInfo.getEmail();
-    Boolean isLoggedIn = (userInfo != null);
-    return ok(Index.render("Home", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts(user)));
+    //UserInfo userInfo = UserInfoDB.getUser(request().username());
+    //String user = userInfo.getEmail();
+    //Boolean isLoggedIn = (userInfo != null);
+    return ok(Index.render("Index", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts(Secured.getUser(ctx()))));
   }
   
   /**
@@ -46,7 +45,7 @@ public class Application extends Controller {
     ContactFormData data = (id == -1) ? new ContactFormData() : new ContactFormData(ContactDB.getContact(user, id));
     Form<ContactFormData> formData = Form.form(ContactFormData.class).fill(data);
     Map<String, Boolean> telephoneTypeMap = TelephoneTypes.getTypes(data.telephoneType);
-    return ok(NewContact.render("New", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData, telephoneTypeMap));
+    return ok(NewContact.render("NewContact", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData, telephoneTypeMap));
     
   }
   
@@ -74,14 +73,14 @@ public class Application extends Controller {
     if (formData.hasErrors()) {
       //Create empty telephoneTypeMap
       Map<String, Boolean> telephoneTypeMap = TelephoneTypes.getTypes();
-      return badRequest(NewContact.render("New", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData, telephoneTypeMap));
+      return badRequest(NewContact.render("NewContact", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData, telephoneTypeMap));
     }
     else {
       ContactFormData data = formData.get(); //Creates the object we made (ContactFormData) and fills with get data
       //Add to database
       ContactDB.addContact(user, data);
       Map<String, Boolean> telephoneTypeMap = TelephoneTypes.getTypes(data.telephoneType);
-      return ok(NewContact.render("New", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData, telephoneTypeMap));
+      return ok(NewContact.render("NewContact", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), formData, telephoneTypeMap));
     }
     
   }
@@ -98,7 +97,7 @@ public class Application extends Controller {
     Boolean isLoggedIn = (userInfo != null);
     ContactDB.deleteContact(user, id);
     
-    return ok(Index.render("Home", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts(user)));
+    return ok(Index.render("Index", Secured.isLoggedIn(ctx()), Secured.getUserInfo(ctx()), ContactDB.getContacts(user)));
   }
   
   /**

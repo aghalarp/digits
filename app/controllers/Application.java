@@ -22,7 +22,7 @@ public class Application extends Controller {
 
   /**
    * Returns the home page. 
-   * @return The resulting home page. 
+   * @return The resulting home page.  
    */
   @Security.Authenticated(Secured.class)
   public static Result index() {

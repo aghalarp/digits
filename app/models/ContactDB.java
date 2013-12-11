@@ -1,9 +1,6 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import views.formdata.ContactFormData;
 
 /**
@@ -13,36 +10,65 @@ import views.formdata.ContactFormData;
  */
 public class ContactDB {
   
-  private static Map<String, Map<Long, Contact>> contacts = new HashMap<String, Map<Long, Contact>>();
-  
   /**
-   * Update the repo with a new Contact if id = 0, or update a pre-existing contact if id != 0.
+   * Update the repo with a new Contact if id = -1, or update a pre-existing contact if id != -1.
    * @param user The user.
    * @param formData The contact data.
-   * @return The newly created contact.
    */
-  public static Contact addContact(String user, ContactFormData formData) {
-    long idVal = (formData.id == 0) ? contacts.size() + 1 : formData.id;
-    Contact contact = new Contact(idVal, formData.firstName, formData.lastName, formData.telephone, 
-        formData.telephoneType);
+  public static void addContact(String user, ContactFormData formData) {
+    boolean isNewContact = (formData.id == -1);
     
-    if (!isUser(user)) {
-      contacts.put(user, new HashMap<Long, Contact>());
+    if (isNewContact) {
+      //Create new Contact entity object
+      Contact contact = new Contact(formData.firstName, formData.lastName, formData.telephone, formData.telephoneType);
+      //Find and create UserInfo entity object
+      UserInfo userInfo = UserInfo.find().where().eq("email", user).findUnique();
+      if (userInfo == null) {
+        throw new RuntimeException("Could not find user: " + user);
+      }
+      
+      //Now connect these entities by setting their fields
+      userInfo.addContact(contact); //Note how the word "add" inherently indicates the OneToMany relationship.
+      contact.setUserInfo(userInfo); //While "set" indicates the OneToOne relationship.
+      
+      //The save method comes from ebeans (when we extended the Model class in the Contact and UserInfo classes)
+      contact.save();
+      userInfo.save();
     }
-    contacts.get(user).put(idVal, contact);
-    return contact;
+    else { //Otherwise, Contact already exists
+      //Retrieve Contact from the database.
+      Contact contact = Contact.find().byId(formData.id);
+      
+      //Then update fields.
+      //Unfortunately we don't know which of these form fields were changed, so we do them all.
+      contact.setFirstName(formData.firstName);
+      contact.setLastName(formData.lastName);
+      contact.setTelephone(formData.telephone);
+      contact.setTelephoneType(formData.telephoneType);
+      
+      //Note: This eBeans save method is smart enough to know that we're updating an existing Contact
+      //rather than creating a new Contact.
+      contact.save();
+      
+    }
   }
   
   /**
    * Returns a list containing all defined contacts.
+   * In other words, returns all Contacts associated with the given user.
    * @param user The user.
    * @return A list of Contact instances or null if user not defined.
    */
   public static List<Contact> getContacts(String user) {
-    if (!isUser(user)) {
+    //Grab the UserInfo object associated with the user.
+    UserInfo userInfo = UserInfo.find().where().eq("email", user).findUnique();
+    
+    if (userInfo == null) {
       return null;
     }
-    return new ArrayList<>(contacts.get(user).values());
+    else {
+      return userInfo.getContacts();
+    }
   }
   
   /**
@@ -51,7 +77,8 @@ public class ContactDB {
    * @return True if the user is defined.
    */
   public static boolean isUser(String user) {
-    return contacts.containsKey(user);
+    //So this returns True if user is found. False otherwise.
+    return (UserInfo.find().where().eq("email", user).findUnique() != null);
   }
   
   /**
@@ -62,18 +89,18 @@ public class ContactDB {
    * @return The retrieved ID.
    */
   public static Contact getContact(String user, long id) {
-    if (!isUser(user)) {
-      throw new RuntimeException("Passed a bogus user: " + user);
-    }
-    
-    Contact contact = contacts.get(user).get(id);
+    Contact contact = Contact.find().byId(id);
     
     if (contact == null) {
-      throw new RuntimeException("Passed a bogus id: " + id);
+      throw new RuntimeException("Contact ID not found: " + id);
     }
-    else {
-      return contact;
+    
+    UserInfo userInfo = contact.getUserInfo();
+    if (!user.equals(userInfo.getEmail())) {
+      throw new RuntimeException("User not the same one stored with the contact.");
     }
+    
+    return contact;
   }
   
   /**
@@ -82,18 +109,20 @@ public class ContactDB {
    * @param id The ID to delete.
    */
   public static void deleteContact(String user, long id) {
-    if (!isUser(user)) {
-      throw new RuntimeException("Passed a bogus user: " + user);
-    }
     
-    Contact contact = contacts.get(user).get(id);
+    Contact contact = Contact.find().byId(id);
     
     if (contact == null) {
-      throw new RuntimeException("Passed a bogus id: " + id);
+      throw new RuntimeException("Contact ID not found: " + id);
     }
-    else {
-      contacts.get(user).remove(id);
+    
+    UserInfo userInfo = contact.getUserInfo();
+    if (!user.equals(userInfo.getEmail())) {
+      throw new RuntimeException("User not the same one stored with the contact.");
     }
+    
+    //eBeans delete method. This should delete the specified contact from the DB.
+    contact.delete();
   }
   
 }
